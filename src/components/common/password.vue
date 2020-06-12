@@ -6,43 +6,30 @@
         </div>
         <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="150">
           <FormItem :label="$t('userInfo.old')" prop="oldPassword">
-            <Input v-model="formValidate.oldPassword"  :placeholder="$t('userInfo.inputOld')" type="password" maxlength="20"></Input>
+            <Input v-model="formValidate.oldPassword"  :placeholder="$t('userInfo.inputOld')" maxlength="30"></Input>
           </FormItem>
           <FormItem :label="$t('userInfo.new')" prop="newPassword">
-            <Input v-model="formValidate.newPassword" :placeholder="$t('userInfo.inputNew')" type="password" maxlength="20"></Input>
+            <Input v-model="formValidate.newPassword" :placeholder="$t('userInfo.inputNew')" type="password" maxlength="30"></Input>
           </FormItem>
           <FormItem :label="$t('userInfo.repeatNew')" prop="repeatNew">
-            <Input v-model="formValidate.repeatNew"  :placeholder="$t('userInfo.inputRepeatNew')" type="password" maxlength="20"></Input>
+            <Input v-model="formValidate.repeatNew"  :placeholder="$t('userInfo.inputRepeatNew')" type="password" maxlength="30"></Input>
           </FormItem>
         </Form>
         <div slot="footer">
           <Button type="text" size="large" @click="cancelSubmit()">{{$t('common.cancel')}}</Button>
-          <Button type="primary" size="large" @click="handleSubmit('formValidate')">{{$t('common.define')}}</Button>
+          <Button type="primary" size="large" @click="handleSubmit('formValidate')">{{$t('common.submit')}}</Button>
         </div>
       </Modal>
 </template>
 
 <script>
-  import { encrypt } from '@/libs/util'
-  import { updateUser} from '@/api/user'
+  import { password} from '@/api/user'
   import {dateToString, getLoginInfo} from '@/libs/tools'
   import {sessionRead} from '@/libs/util'
   export default {
     name: "password",
     props: ['editModal'],
     data() {
-      const validatePass = (rule, value, callback) => {
-        if (this.formValidate.newPassword!=null) {
-          let regex = "^(?!^(\\d+|[a-zA-Z]+|[~!@#$%^&*?]+)$)^[\\w~!@#$%^&*?]{6,18}$";
-          if(new RegExp(regex).test(this.formValidate.newPassword)){
-            callback();
-          }else{
-            callback(new Error(this.$t('userInfo.tip')));
-          }
-        } else {
-          callback(new Error(this.$t('userInfo.inputNew')));
-        }
-      };
       return {
         formValidate: {
           newPassword: "",
@@ -52,7 +39,7 @@
         ruleValidate: {
           newPassword: [{
             required: true,
-            validator: validatePass,
+            message: this.$t('userInfo.inputNew'),
             trigger: 'blur',
             type: 'string'
           }],
@@ -79,11 +66,10 @@
             let data=this.formValidate;
             if(data.newPassword === data.repeatNew){
               let params={
-                id:loginInfo['id'],
-                oldPassword:encrypt(data.oldPassword),
-                newPassword:encrypt(data.newPassword)
+                oldPassword:data.oldPassword,
+                newPassword:data.newPassword
               };
-              updateUser(params).then(res => {
+              password(params).then(res => {
                 if (res.data.success) {
                   this.$Message.success(this.$t('common.editSuccess'));
                   this.$emit('editSuccess');

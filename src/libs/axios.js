@@ -25,17 +25,17 @@ const addErrorLog = errorInfo => {
 }
 
 class HttpRequest {
-  constructor (baseUrl = baseURL) {
+  constructor(baseUrl = baseURL) {
     this.baseUrl = baseUrl
     this.queue = {}
   }
-  getInsideConfig () {
+  getInsideConfig() {
     let header = {}
     let userInfo = JSON.parse(sessionStorage.getItem('loginInfo'))
     if (userInfo && userInfo.id) {
       header = {
-        'sms-uid': userInfo.id,
-        'sms-token': userInfo.token
+        'sms-uid': userInfo.id
+        // 'sms-token': userInfo.token
       }
     }
     const config = {
@@ -45,13 +45,13 @@ class HttpRequest {
     }
     return config
   }
-  destroy (url) {
+  destroy(url) {
     delete this.queue[url]
     if (!Object.keys(this.queue).length) {
       // Spin.hide()
     }
   }
-  interceptors (instance, url) {
+  interceptors(instance, url) {
     // 请求拦截
     instance.interceptors.request.use(config => {
       // 添加全局的loading...
@@ -83,13 +83,13 @@ class HttpRequest {
           path: 'login'
         })
       }
-      addErrorLog(error.response)
+      addErrorLog(error.response);
       return Promise.reject(error)
     })
   }
-  request (options) {
-    const instance = axios.create()
-    options = Object.assign(this.getInsideConfig(), options)
+  request(options) {
+    const instance = axios.create();
+    options = Object.assign(this.getInsideConfig(), options);
     this.interceptors(instance, options.url)
     return instance(options)
   }

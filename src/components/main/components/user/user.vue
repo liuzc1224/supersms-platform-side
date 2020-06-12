@@ -1,51 +1,63 @@
 <template>
-  <div class="user-avatar-dropdown">
+  <div class="user-avator-dropdown">
     <Dropdown @on-click="handleClick">
-<!--      <Badge :dot="!!messageUnreadCount">-->
-<!--        <Avatar :src="userAvatar"/>-->
+      <Badge :dot="!!messageUnreadCount">
         <Avatar style="background-color: #87d068" icon="ios-person"/>
-        <span class="nameTitle">{{setName(userName)}}</span>
-<!--      </Badge>-->
-<!--      <Badge :count="messageUnreadCount">-->
-      <Icon :size="26" type="md-arrow-dropdown"></Icon>
-<!--      </Badge>-->
+      </Badge>
+      <Icon :size="18" type="md-arrow-dropdown"></Icon>
       <DropdownMenu slot="list">
-<!--        <DropdownItem name="message">-->
-<!--          消息中心<Badge style="margin-left: 10px" :count="messageUnreadCount"></Badge>-->
-<!--          {{$t('userInfo.message')}}<Badge style="margin-left: 10px" :count="messageUnreadCount"></Badge>-->
-<!--        </DropdownItem>-->
-<!--        <DropdownItem name="personalInfo">-->
-<!--          {{$t('userInfo.personalInfo')}}-->
-<!--        </DropdownItem>-->
+        <DropdownItem name="message">
+          消息中心<Badge style="margin-left: 10px" :count="messageUnreadCount"></Badge>
+        </DropdownItem>
         <DropdownItem name="password">
           {{$t('userInfo.password')}}
+        </DropdownItem>
+        <DropdownItem name="userInfo">
+          {{$t('userInfo.usrInfo')}}
         </DropdownItem>
 <!--        <DropdownItem name="logout">退出登录</DropdownItem>-->
         <DropdownItem name="logout">{{$t('userInfo.logout')}}</DropdownItem>
       </DropdownMenu>
     </Dropdown>
+
+
     <password
       :editModal="passwordModal"
       v-on:changeModal="changeModal"
     ></password>
+    <user-info
+      :editModal="userInfoModal"
+      :chooseItem="userInfoItem"
+      v-on:changeModal="changeUserInfo"
+      >
+    </user-info>
   </div>
 </template>
 
 <script>
 import './user.less'
-import Password from "../../../common/password";
+import { getUserInfo } from '@/api/user'
 import { mapActions } from 'vuex'
+import Password from "../../../common/password";
+import UserInfo from "../../../common/userInfo";
+import {sessionRead} from '@/libs/util'
 export default {
   name: 'User',
-  components: {Password},
+  components: {UserInfo, Password},
   data(){
     return {
       passwordModal: false,
-      userName:JSON.parse(sessionStorage.getItem("loginInfo"))['accountNo'] || ''
+      userInfoModal: false,
+      userInfoItem:{
+        department: null,
+        name: null,
+        permission: null,
+        phoneNumber: null,
+      }
     }
   },
   props: {
-    userAvatar: {
+    userAvator: {
       type: String,
       default: ''
     },
@@ -55,9 +67,23 @@ export default {
     }
   },
   methods: {
+
     ...mapActions([
       'handleLogOut'
     ]),
+    changeModal(param) {
+      this.passwordModal = param;
+    },
+    changeUserInfo(param){
+      this.userInfoModal = param;
+      this.userInfoItem({'row': {}});
+    },
+    setUserInfoItem(params){
+      this.userInfoItem.name = params.name;
+      this.userInfoItem.department = params.department;
+      this.userInfoItem.permission = params.permission;
+      this.userInfoItem.phoneNumber = params.phoneNumber;
+    },
     logout () {
       this.handleLogOut().then(() => {
         this.$router.push({
@@ -65,44 +91,48 @@ export default {
         })
       })
     },
-    changeModal(param) {
-      this.passwordModal = param;
-    },
-
-    personalInfo(){
+    message () {
       this.$router.push({
-        name: 'personal_info'
+        name: 'message_page'
       })
     },
     password(){
       this.passwordModal= true;
     },
+    userInfo(){
+      let loginInfo = sessionRead('loginInfo');
+      let params={
+        id:loginInfo['id']
+      };
+      getUserInfo(params).then(res => {
+        if (res.data.success) {
+          let param=res.data.data;
+          let data={
+            name:param['description'],
+            department:param['departmentDTOS'][0]['description'],
+            permission:param['roleOutputVOS'][0]['description'],
+            phoneNumber:param['phoneNumber'],
+          };
+          this.setUserInfoItem(data);
+          this.userInfoModal= true;
+        } else {
+          this.$Message.error(res.data.message)
+        }
+      });
+
+    },
     handleClick (name) {
       switch (name) {
-        case 'logout': this.logout();
+        case 'logout': this.logout();localStorage.removeItem('tagNaveList');
+          break;
+        case 'message': this.message();
           break;
         case 'password': this.password();
           break;
-        // case 'message': this.messageData();
-        //   break;
-        // case 'personalInfo': this.personalInfo();
-        //   break
+        case 'userInfo': this.userInfo();
+          break;
       }
-    },
-    setName(data){
-      let str;
-      if(data && data.length>10){
-        str=data.substring(0,7)+'***'
-      }else{
-        str=data;
-      }
-      return str;
     }
   }
 }
 </script>
-<style>
-  .nameTitle{
-    padding-left: 10px;
-  }
-</style>

@@ -213,3 +213,22 @@ export const objEqual = (obj1, obj2) => {
   /* eslint-disable-next-line */
   else return !keysArr1.some(key => obj1[key] != obj2[key])
 }
+
+/**
+ * @param {Date} date 时间对象
+ * @param {string} str 连字符
+ * @description 根据时间对象，返回 yyyy-MM-dd 字符串
+ */
+export const dateToString = (date, str) => {
+  var year = date.getFullYear();
+  var month = date.getMonth() + 1;
+  var day = date.getDate();
+  if (month < 10) {
+    month ="0" + month;
+  }
+  if (day < 10) {
+    day ="0" + day;
+  }
+  var dateString = year + str + month + str + day;
+  return dateString
+}

@@ -1,141 +1,127 @@
-import axios from '../libs/api.request'
+import axios from '@/libs/api.request'
 
-export const login = (data) => {
+export const login = ({
+  username,
+  password
+}) => {
+  let data = new FormData();
+  data.append('username', username);
+  data.append('password', password);
   return axios.request({
-    url: '/user/login',
-    data: data,
+    url: '/employee/login',
+    data,
     method: 'post'
+    // headers:{"Content-Type":"application/x-www-form-urlencoded"}
   })
-}
-
-export const getUserInfo = () => {
-  return axios.request({
-    url: '/user/info',
-    method: 'get'
-  })
-}
+};
 
 export const logout = (token) => {
   return axios.request({
     url: 'logout',
     method: 'post'
   })
-}
-
-export const getUnreadCount = () => {
-  return axios.request({
-    url: 'message/count',
-    method: 'get'
-  })
-}
-
-export const getMessage = () => {
-  return axios.request({
-    url: 'message/init',
-    method: 'get'
-  })
-}
-
-export const getContentByMsgId = msg_id => {
-  return axios.request({
-    url: 'message/content',
-    method: 'get',
-    params: {
-      msg_id
-    }
-  })
-}
-
-export const hasRead = msg_id => {
-  return axios.request({
-    url: 'message/has_read',
-    method: 'post',
-    data: {
-      msg_id
-    }
-  })
-}
-
-export const removeReaded = msg_id => {
-  return axios.request({
-    url: 'message/remove_readed',
-    method: 'post',
-    data: {
-      msg_id
-    }
-  })
-}
-
-export const restoreTrash = msg_id => {
-  return axios.request({
-    url: 'message/restore',
-    method: 'post',
-    data: {
-      msg_id
-    }
-  })
-}
-
-// 获取验证码
-export const picturecode = () => {
-  return axios.request({
-    url: '/picturecode',
-    method: 'get'
-  })
-}
-// 注册
-export const register = (data) => {
-  return axios.request({
-    url: '/user/register',
-    data,
-    method: 'post'
-  })
-}
-//账户名是否存在
-export const checkExist= (params) => {
-  return axios.request({
-    url: '/user/checkExist/'+params['name'],
-    method: 'get'
-  })
 };
-//修改密码
-export const updateUser= (data) => {
+
+//获取用户注册列表
+export const getRegUserList = query => {
   return axios.request({
     url: '/user',
-    data:data,
-    method: 'put'
+    method: 'get',
+    params: query
   })
 };
-//消息中心
-export const getNews= () => {
+//账单列表
+export const bill = query => {
   return axios.request({
-    url: '/news',
-    method: 'get'
+    url: '/userInfo/detail/bill',
+    method: 'get',
+    params: query
   })
 };
-//是否有未读消息
-export const getNewsStatus= () => {
+//资金账户
+export const account = query => {
   return axios.request({
-    url: '/news/status',
-    method: 'get'
+    url: '/userInfo/detail/account',
+    method: 'get',
+    params: query
   })
 };
-export const alreadyreadDelete= () => {
+//消费记录
+export const consumption = query => {
   return axios.request({
-    url: '/news/alreadyread',
+    url: '/userInfo/detail/consumption',
+    method: 'get',
+    params: query
+  })
+};
+//邀请记录
+export const inviteRecord = query => {
+  return axios.request({
+    url: '/userInfo/invite',
+    method: 'get',
+    params: query
+  })
+};
+export const getList = query => {
+  return axios.request({
+    url: '/userInfo/getList',
+    method: 'get',
+    params: query
+  })
+};
+
+//获取黑白名单列表
+export const getBlackandWhiteList = query => {
+  return axios.request({
+    url: '/blackandwhite/getList',
+    method: 'get',
+    params: query
+  })
+};
+//删除黑白名单
+export const deleteBlackandWhiteList = id => {
+  return axios.request({
+    url: `/blackandwhite/${id}`,
     method: 'delete'
   })
 };
-export const alreadyreadPost= (data) => {
+
+//新增黑白名单
+export const addBlackandWhiteList = params => {
   return axios.request({
-    url: '/news/alreadyread',
-    data:data,
-    method: 'post'
+    url: '/blackandwhite',
+    method: 'post',
+    data: params
   })
 };
-export const getServiceTime= () => {
+//修改黑白名单
+export const putBlackandWhiteList = params => {
   return axios.request({
-    url: '/sms/getServiceTime',
-    method: 'get'
+    url: '/blackandwhite',
+    method: 'put',
+    data: params
+  })
+};
+//修改密码
+
+export const password = params => {
+  return axios.request({
+    url: '/employee/password/update',
+    method: 'put',
+    data: params
+  })
+};
+export const employee = params => {
+  return axios.request({
+    url: '/employee/phonenum/update',
+    method: 'put',
+    data: params
+  })
+};
+export const getUserInfo = params => {
+  return axios.request({
+    url: '/employee/'+params['id'],
+    method: 'get',
+    data: params
   })
 };

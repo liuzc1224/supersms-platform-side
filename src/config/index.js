@@ -1,9 +1,5 @@
 export default {
   /**
-   * @description 配置显示在浏览器标签的title
-   */
-  title: 'SMS',
-  /**
    * @description token在Cookie中存储的天数，默认1天
    */
   cookieExpires: 1,
@@ -17,29 +13,26 @@ export default {
    * @description api请求基础路径
    */
   baseUrl: {
-    //开发环境
-    // dev: 'http://121.40.73.203:8090',
-    dev: 'http://192.168.1.154:8090',//剑康
-    // dev: 'http://192.168.1.190:8090',//希良
+    dev: 'http://121.40.73.203:8091',//测试
+    // dev: 'http://192.168.1.133:8091',//顾
+    // dev: 'http://192.168.1.190:8091',//希良
 
-    //线上
+    // dev: 'http://192.168.1.154:8091',//健康 开发地址
 
-    // pro: 'http://api.dolphinftsms.com',
-
-    //测试
-    pro: 'http://121.40.73.203:8090'
+    // pro: 'http://back.dolphinftsms.com',//线上地址
+    pro: 'http://121.40.73.203:8091',//测试地址
   },
   /**
    * @description 默认打开的首页的路由name值，默认为home
    */
-  homeName: 'home',
+  homeName: "home",
   /**
    * @description 需要加载的插件
    */
   plugin: {
-    'error-store': {
+    "error-store": {
       showInHeader: true, // 设为false后不会在顶部显示错误日志徽标
       developmentOff: true // 设为true后在开发环境不会收集错误信息，方便开发中排查错误
     }
   }
-}
+};

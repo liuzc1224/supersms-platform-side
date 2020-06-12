@@ -9,21 +9,24 @@ import {
   routeEqual,
   getRouteTitleHandled,
   localSave,
-  localRead
-} from '@/libs/util'
-// import { saveErrorLogger } from '@/api/data'
-import router from '@/router'
-import routers from '@/router/routers'
-import config from '@/config'
-const { homeName } = config;
+  localRead,
+  sessionRead
+} from '@/libs/util';
+import beforeClose from '@/router/before-close';
+import { saveErrorLogger } from '@/api/data';
+import router from '@/router';
+import getRouterReq from '@/api/routers';
+import config from '@/config';
+import routers from '@/router/routers';
+const { homeName } = config
 
 const closePage = (state, route) => {
-  const nextRoute = getNextRoute(state.tagNavList, route);
+  const nextRoute = getNextRoute(state.tagNavList, route)
   state.tagNavList = state.tagNavList.filter(item => {
     return !routeEqual(item, route)
-  });
+  })
   router.push(nextRoute)
-};
+}
 
 export default {
   state: {
@@ -32,10 +35,12 @@ export default {
     homeRoute: {},
     local: localRead('local'),
     errorList: [],
-    hasReadErrorPage: false
+    hasReadErrorPage: false,
+    menuList: sessionRead ('tree') || []
   },
   getters: {
-    menuList: (state, getters, rootState) => getMenuByRouter(routers, rootState.user.access),
+    // menuList: (state, getters, rootState) => getMenuByRouter(routers, rootState.user.access),
+    menuList: (state, getters, rootState) => getMenuByRouter(state.menuList, rootState.user.access),
     errorCount: state => state.errorList.length
   },
   mutations: {
@@ -46,44 +51,54 @@ export default {
       state.homeRoute = getHomeRoute(routes, homeName)
     },
     setTagNavList (state, list) {
-      let tagList = [];
+      let tagList = []
       if (list) {
         tagList = [...list]
-      } else tagList = getTagNavListFromLocalstorage() || [];
-      if (tagList[0] && tagList[0].name !== homeName) tagList.shift();
-      let homeTagIndex = tagList.findIndex(item => item.name === homeName);
+      } else tagList = getTagNavListFromLocalstorage() || []
+      if (tagList[0] && tagList[0].name !== homeName) tagList.shift()
+      let homeTagIndex = tagList.findIndex(item => item.name === homeName)
       if (homeTagIndex > 0) {
-        let homeTag = tagList.splice(homeTagIndex, 1)[0];
+        let homeTag = tagList.splice(homeTagIndex, 1)[0]
         tagList.unshift(homeTag)
       }
-      state.tagNavList = tagList;
+      state.tagNavList = tagList
       setTagNavListInLocalstorage([...tagList])
     },
     closeTag (state, route) {
-      let tag = state.tagNavList.filter(item => routeEqual(item, route));
-      route = tag[0] ? tag[0] : null;
-      if (!route) return;
-      closePage(state, route)
+      let tag = state.tagNavList.filter(item => routeEqual(item, route))
+      route = tag[0] ? tag[0] : null
+      if (!route) return
+      if (route.meta && route.meta.beforeCloseName && route.meta.beforeCloseName in beforeClose) {
+        new Promise(beforeClose[route.meta.beforeCloseName]).then(close => {
+          if (close) {
+            closePage(state, route)
+          }
+        })
+      } else {
+        closePage(state, route)
+      }
     },
     addTag (state, { route, type = 'unshift' }) {
       let router = getRouteTitleHandled(route);
       if (!routeHasExist(state.tagNavList, router)) {
-        if (type === 'push') state.tagNavList.push(router);
+        if (type === 'push'){
+          state.tagNavList.push(router)
+        }
         else {
-          if (router.name === homeName) state.tagNavList.unshift(router);
+          if (router.name === homeName) state.tagNavList.unshift(router)
           else state.tagNavList.splice(1, 0, router)
         }
         setTagNavListInLocalstorage([...state.tagNavList])
       }
     },
-    initTagNavList(state,data){
-      state.tagNavList = data;
-      setTagNavListInLocalstorage([])
-    },
     setLocal (state, lang) {
-      localSave('local', lang);
+      localSave('local', lang)
       state.local = lang
     },
+    setMnuList (state, tree) {
+      state.menuList = tree
+    },
+
     addError (state, error) {
       state.errorList.push(error)
     },
@@ -93,15 +108,15 @@ export default {
   },
   actions: {
     addErrorLog ({ commit, rootState }, info) {
-      // if (!window.location.href.includes('error_logger_page')) commit('setHasReadErrorLoggerStatus', false)
-      // const { user: { token, userId, accountNo } } = rootState
-      // let data = {
-      //   ...info,
-      //   time: Date.parse(new Date()),
-      //   token,
-      //   userId,
-      //   accountNo
-      // }
+      if (!window.location.href.includes('error_logger_page')) commit('setHasReadErrorLoggerStatus', false)
+      const { user: { token, userId, userName } } = rootState
+      let data = {
+        ...info,
+        time: Date.parse(new Date()),
+        token,
+        userId,
+        userName
+      }
       // saveErrorLogger(info).then(() => {
       //   commit('addError', data)
       // })

@@ -9,23 +9,23 @@ import i18n from '@/locale'
 import config from '@/config'
 import importDirective from '@/directive'
 import installPlugin from '@/plugin'
-import './index.less'
 import 'view-design/dist/styles/iview.css'
+import './index.less'
 import '@/assets/icons/iconfont.css'
-import 'v-org-tree/dist/v-org-tree.css'
 // 实际打包时应该不引入mock
+// import './mock/index'
 /* eslint-disable */
 // if (process.env.NODE_ENV !== 'production') require('@/mock')
 
+// 引入mockjs
+// require('./mock.js')
 Vue.use(iView, {
   i18n: (key, value) => i18n.t(key, value)
-});
-// Vue.use(TreeTable)
-// Vue.use(VOrgTree)
+})
 /**
  * @description 注册admin内置插件
  */
-installPlugin(Vue);
+installPlugin(Vue)
 /**
  * @description 生产环境关掉提示
  */
@@ -38,7 +38,6 @@ Vue.prototype.$config = config
  * 注册指令
  */
 importDirective(Vue)
-// Vue.directive('clickOutside', clickOutside)
 
 /* eslint-disable no-new */
 new Vue({
@@ -47,4 +46,5 @@ new Vue({
   i18n,
   store,
   render: h => h(App)
-})
+});
+

@@ -1,11 +1,8 @@
 import axios from '@/libs/api.request'
 
-export const getRouterReq = (access) => {
+export const getRouterReq = (id) => {
   return axios.request({
-    url: 'get_router',
-    params: {
-      access
-    },
+    url: `/menu/tree/${id}`,
     method: 'get'
   })
 }

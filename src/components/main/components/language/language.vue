@@ -1,15 +1,12 @@
 <template>
-  <div style="padding-left: 20px">
+  <div>
     <Dropdown trigger="click" @on-click="selectLang">
       <a href="javascript:void(0)">
         {{ title }}
         <Icon :size="18" type="md-arrow-dropdown" />
       </a>
       <DropdownMenu slot="list">
-        <DropdownItem name="zh-CN">{{$t('lang.zh-CN')}}</DropdownItem>
-        <DropdownItem name="en-US" divided>{{$t('lang.en-US')}}</DropdownItem>
-        <DropdownItem name="id-ID" divided>{{$t('lang.id-ID')}}</DropdownItem>
-<!--        <DropdownItem v-for="(value, key) in localList" :name="key" :key="`lang-${key}`">{{ value }}</DropdownItem>-->
+        <DropdownItem v-for="(value, key) in localList" :name="key" :key="`lang-${key}`">{{ value }}</DropdownItem>
       </DropdownMenu>
     </Dropdown>
   </div>
@@ -25,13 +22,13 @@ export default {
     return {
       langList: {
         'zh-CN': '语言',
-        'zh-TW': '語言',
+        'pt-BR': 'Idioma',
         'en-US': 'Lang'
       },
       localList: {
         'zh-CN': '中文简体',
-        'zh-TW': '中文繁体',
-        'en-US': 'English'
+        'pt-BR': 'Português',
+        // 'en-US': 'English'
       }
     }
   },
@@ -42,13 +39,11 @@ export default {
   },
   computed: {
     title () {
-      // return this.langList[this.lang]
-      return this.$t('lang')[this.lang]
+      return this.langList[this.lang]
     }
   },
   methods: {
     selectLang (name) {
-      // this.$emit('lang-change', name)
       this.$emit('on-lang-change', name)
     }
   }

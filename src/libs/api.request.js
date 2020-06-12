@@ -1,6 +1,6 @@
 import HttpRequest from '@/libs/axios'
 import config from '@/config'
-let baseUrl = '';
+let baseUrl="";
 if (process.env.NODE_ENV === 'onlinetest') {
   baseUrl = config.baseUrl.online
 } else if (process.env.NODE_ENV === 'production') {
@@ -8,6 +8,6 @@ if (process.env.NODE_ENV === 'onlinetest') {
 } else {
   baseUrl = config.baseUrl.dev
 }
-console.log(process.env.NODE_ENV)
+console.log(process.env);
 const axios = new HttpRequest(baseUrl);
 export default axios
